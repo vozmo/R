@@ -68,3 +68,96 @@ ggplot(data, aes(x = symmetry_mean, y = area_mean)) +
 Второй график также демонстрирует сильную линейную зависимость между средним радиусом и средним периметром опухоли. Здесь данные лежат очень близко к линии регрессии, что указывает на более точную связь между этими двумя переменными.
 Третий график показывает, что связь между средним радиусом опухоли и средней симметричностью менее выражена. Здесь точки данных распределены более рассеянно вокруг линейной линии, что указывает на слабую зависимость между этими переменными.
 
+## Задание 2 (2 балла)
+
+Для выполнения этого задания построим две модели: первая будет предсказывать вероятность злокачественной опухоли от среднего радиуса (radius_mean), средней площади (area_mean) и средней текстуры (texture_mean). Вторая модель будет использовать все три перечисленных фактора для предсказания вероятности злокачественной опухоли.
+
+Модель 1: Предсказание вероятности злокачественной опухоли от среднего радиуса, средней площади и средней текстуры
+
+1. Преобразуем диагноз (M/B) в бинарный формат: злокачественная опухоль (M) будет 1, доброкачественная (B) - 0.
+2. Построим логистическую регрессию для прогнозирования вероятности злокачественной опухоли.
+
+```{r}
+# Преобразуем диагноз в бинарный формат
+data$diagnosis_binary <- ifelse(data$diagnosis == "M", 1, 0)
+
+# Создаем модель логистической регрессии
+model1 <- glm(diagnosis_binary ~ radius_mean + area_mean + texture_mean, data = data, family = "binomial")
+
+# Выводим сводку по модели
+summary(model1)
+```
+
+Построим графики, чтобы визуализировать связь между переменными и вероятностью злокачественной опухоли.
+
+```{r}
+# Графики для каждой переменной
+ggplot(data, aes(x = radius_mean, y = diagnosis_binary)) +
+  geom_point() +
+  geom_smooth(method = "glm", method.args = list(family = "binomial"), color = "blue") +
+  labs(title = "Probability of Malignant Tumor vs. Mean Radius",
+       x = "Mean Radius",
+       y = "Probability of Malignant Tumor")
+
+ggplot(data, aes(x = area_mean, y = diagnosis_binary)) +
+  geom_point() +
+  geom_smooth(method = "glm", method.args = list(family = "binomial"), color = "red") +
+  labs(title = "Probability of Malignant Tumor vs. Mean Area",
+       x = "Mean Area",
+       y = "Probability of Malignant Tumor")
+
+ggplot(data, aes(x = texture_mean, y = diagnosis_binary)) +
+  geom_point() +
+  geom_smooth(method = "glm", method.args = list(family = "binomial"), color = "green") +
+  labs(title = "Probability of Malignant Tumor vs. Mean Texture",
+       x = "Mean Texture",
+       y = "Probability of Malignant Tumor")
+```
+
+Модель 2: Предсказание вероятности злокачественной опухоли от всех трех факторов
+
+Построим логистическую регрессию, используя все три переменные (radius_mean, area_mean, texture_mean).
+
+```{r}
+# Создаем модель логистической регрессии с тремя переменными
+model2 <- glm(diagnosis_binary ~ radius_mean + area_mean + texture_mean, data = data, family = "binomial")
+
+# Выводим сводку по модели
+summary(model2)
+```
+
+Построим графики для визуализации предсказанных вероятностей.
+
+```{r}
+# График предсказанных вероятностей злокачественной опухоли
+data$predicted_probability <- predict(model2, type = "response")
+
+ggplot(data, aes(x = radius_mean, y = predicted_probability)) +
+  geom_point() +
+  geom_smooth(method = "loess", color = "blue") +
+  labs(title = "Predicted Probability of Malignant Tumor vs. Mean Radius",
+       x = "Mean Radius",
+       y = "Predicted Probability of Malignant Tumor")
+
+ggplot(data, aes(x = area_mean, y = predicted_probability)) +
+  geom_point() +
+  geom_smooth(method = "loess", color = "red") +
+  labs(title = "Predicted Probability of Malignant Tumor vs. Mean Area",
+       x = "Mean Area",
+       y = "Predicted Probability of Malignant Tumor")
+
+ggplot(data, aes(x = texture_mean, y = predicted_probability)) +
+  geom_point() +
+  geom_smooth(method = "loess", color = "green") +
+  labs(title = "Predicted Probability of Malignant Tumor vs. Mean Texture",
+       x = "Mean Texture",
+       y = "Predicted Probability of Malignant Tumor")
+```
+
+В результате выполнения этих шагов мы получим две модели логистической регрессии для предсказания вероятности злокачественной опухоли на основе выбранных факторов. Графики позволяют наглядно оценить связь между этими переменными и вероятностью злокачественной опухоли.
+Комментарии к графикам:
+Первая модель:
+Слабо коррелирует, не позволяет сделать выводы о зависимости, выбранные параметры неинформативны.
+Вторая модель:
+График демонстрирует более точную модель предсказания вероятности злокачественности опухоли.
+
