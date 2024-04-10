@@ -1,0 +1,70 @@
+---
+title: "HW5_Novikov"
+output: html_document
+date: "2024-04-10"
+---
+
+# Загр. библиотеки
+```{r}
+library(readr)
+library(ggplot2)
+library(tidyr)
+library(dplyr)
+library(pROC)
+library(tidyverse)
+library(car)
+library(survival)
+library(ggsurvfit)
+library(survminer)
+```
+
+## Загр. и пров. датасет
+```{r}
+# Загрузка датасета
+data <- read.csv("wisconsin_breast_cancer.csv")
+
+# Проверим структуру датасета и первые строки
+str(data)
+head(data)
+```
+
+## Задание 1 (2 балла)
+
+```{r}
+# Создаем регрессионную модель
+model <- lm(area_mean ~ radius_mean + perimeter_mean + symmetry_mean, data = data)
+
+# Выводим сводку по модели
+summary(model)
+```
+
+```{r}
+# Создаем точечные графики для каждой пары переменных
+ggplot(data, aes(x = radius_mean, y = area_mean)) +
+  geom_point() + 
+  geom_smooth(method = "lm", formula = y ~ x, color = "blue") +
+  labs(title = "Scatter Plot of Radius vs. Area",
+       x = "Mean Radius",
+       y = "Mean Area")
+
+ggplot(data, aes(x = perimeter_mean, y = area_mean)) +
+  geom_point() + 
+  geom_smooth(method = "lm", formula = y ~ x, color = "red") +
+  labs(title = "Scatter Plot of Perimeter vs. Area",
+       x = "Mean Perimeter",
+       y = "Mean Area")
+
+ggplot(data, aes(x = symmetry_mean, y = area_mean)) +
+  geom_point() + 
+  geom_smooth(method = "lm", formula = y ~ x, color = "green") +
+  labs(title = "Scatter Plot of Symmetry vs. Area",
+       x = "Mean Symmetry",
+       y = "Mean Area")
+```
+
+Мы использовали линейную модель для предсказания средней площади опухоли на основе среднего радиуса, среднего периметра и средней симметричности опухоли.
+На графиках отражены точки данных и линия линейной регрессии. Мы можем видеть, как линия наилучшего соответствия отображает связь между переменными.
+На первом графике представлена зависимость средней площади опухоли от среднего радиуса. Мы видим явную положительную взаимосвязь между этими переменными, где данные распределены преимущественно вдоль линейной трендовой линии. Это означает, что с увеличением среднего радиуса опухоли обычно увеличивается и средняя площадь.
+Второй график также демонстрирует сильную линейную зависимость между средним радиусом и средним периметром опухоли. Здесь данные лежат очень близко к линии регрессии, что указывает на более точную связь между этими двумя переменными.
+Третий график показывает, что связь между средним радиусом опухоли и средней симметричностью менее выражена. Здесь точки данных распределены более рассеянно вокруг линейной линии, что указывает на слабую зависимость между этими переменными.
+
